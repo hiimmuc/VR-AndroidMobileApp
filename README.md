@@ -1,4 +1,4 @@
-# vr_camera_viewer
+# VR HuRoLab
 
 Viewing the camera in VR mode
 
