@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:VRHuRoLab/UI/IMU.dart';
+import 'package:VRHuRoLab/UI/homepage.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -141,7 +142,7 @@ class _CameraScreenState extends State<CameraScreen> {
     previewHeight = mediaQueryData.size.height * 1.5;
 
     Color color = Colors.white;
-    var state = "recording";
+    var state = "Recording: $isRecording | Streaming: $isStreaming";
     // startCameraRecording();
 
     return Scaffold(
@@ -155,253 +156,255 @@ class _CameraScreenState extends State<CameraScreen> {
             focusNode: _focusNode,
             onKeyEvent: _handleKeyEvent,
             child: ListenableBuilder(
-                listenable: _focusNode,
-                builder: (BuildContext context, Widget? child) {
-                  return Stack(
-                    children: [
-                      Center(
-                        child: Row(
-                          children: [
-                            // right eye
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: _switchCamera,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  child: Transform.translate(
-                                    offset: Offset(xOffset, 0),
-                                    child: Transform.rotate(
-                                      angle: (cameraAngle * pi) / 180,
-                                      child: Transform.scale(
-                                        scale: cameraZoom,
-                                        child: FittedBox(
-                                          fit: BoxFit.cover,
-                                          child: SizedBox(
-                                            width: previewWidth,
-                                            height: previewHeight,
-                                            child: CameraPreview(controller!),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            // left eye
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: _switchCamera,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  child: Transform.translate(
-                                    offset: Offset(-xOffset, 0),
-                                    child: Transform.rotate(
-                                      angle: (cameraAngle * pi) / 180,
-                                      child: Transform.scale(
-                                        scale: cameraZoom,
-                                        child: FittedBox(
-                                          fit: BoxFit.cover,
-                                          child: SizedBox(
-                                            width: previewWidth,
-                                            height: previewHeight,
-                                            child: CameraPreview(controller!),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // sliders
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
+              listenable: _focusNode,
+              builder: (BuildContext context, Widget? child) {
+                return Stack(
+                  children: [
+                    Center(
+                      child: Row(
                         children: [
-                          //First el
-                          Positioned(
-                            left: 10,
-                            right: 10,
-                            child: Row(
-                              children: [
-                                // Text for angle
-                                Column(
-                                  children: [
-                                    //text offset
-                                    Text(
-                                      xOffset.toStringAsFixed(2),
-                                      style: const TextStyle(
-                                          color: Color.fromARGB(216, 0, 255, 0),
-                                          fontSize: 12),
-                                    ),
-                                    //text angle
-                                    Text(
-                                      cameraAngle.toStringAsFixed(2),
-                                      style: const TextStyle(
-                                          color:
-                                          Color.fromARGB(216, 255, 165, 0),
-                                          fontSize: 16),
-                                    ),
-                                    //test zoom
-                                    Text(
-                                      cameraZoom.toStringAsFixed(2),
-                                      style: const TextStyle(
-                                          color: Color.fromARGB(216, 255, 0, 0),
-                                          fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-
-                                SizedBox(width: paddingWidth * 0.1),
-
-                                // Slider for offset
-                                Expanded(
-                                  child: Slider(
-                                    value: xOffset,
-                                    activeColor: const Color.fromARGB(
-                                        100, 115, 115, 115),
-                                    inactiveColor: const Color.fromARGB(
-                                        100, 115, 115, 115),
-                                    onChanged: (newValue) {
-                                      setState(() {
-                                        xOffset = newValue;
-                                      });
-                                    },
-                                    min: 0,
-                                    max: maxSliderValue,
-                                  ),
-                                ),
-                                //padding
-                                SizedBox(width: paddingWidth * 0.8),
-                                // Escape button
-                                IconButton(
-                                  iconSize: 20,
-                                  icon: const Icon(
-                                    Icons.exit_to_app,
-                                    color: Colors.white,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(
-                                      context,
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          // Second block
-                          Positioned(
-                            left: 0,
-                            right: 0,
-                            // alignment: Alignment.center,
-                            child: Row(
-                              children: <Widget>[
-                                //padding left
-                                SizedBox(
-                                  width: paddingWidth * 0.8,
-                                ),
-                                //Slider for rotate
-                                Container(
-                                  width: sliderWidth,
-                                  alignment: Alignment.centerLeft,
-                                  child: Expanded(
-                                    child: RotatedBox(
-                                      quarterTurns: 1,
-                                      child: Slider(
-                                        value: cameraAngle,
-                                        divisions: (maxAngleValue.toInt() -
-                                            minAngleValue.toInt()),
-                                        label: '${cameraAngle.toInt()}',
-                                        activeColor: Colors.grey,
-                                        inactiveColor:
-                                        Colors.grey.withOpacity(0.2),
-                                        onChanged: (dynamic newValue) {
-                                          setState(() {
-                                            cameraAngle = newValue;
-                                          });
-                                        },
-                                        min: minAngleValue,
-                                        max: maxAngleValue,
+                          // right eye
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: _switchCamera,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10.0),
+                                child: Transform.translate(
+                                  offset: Offset(xOffset, 0),
+                                  child: Transform.rotate(
+                                    angle: (cameraAngle * pi) / 180,
+                                    child: Transform.scale(
+                                      scale: cameraZoom,
+                                      child: FittedBox(
+                                        fit: BoxFit.cover,
+                                        child: SizedBox(
+                                          width: previewWidth,
+                                          height: previewHeight,
+                                          child: CameraPreview(controller!),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                                //padding for screen view
-                                SizedBox(
-                                    width: previewWidth -
-                                        2 * sliderWidth -
-                                        2 * paddingWidth),
-                                //Slider for camera zoom
-                                Container(
-                                  width: sliderWidth,
-                                  alignment: Alignment.centerLeft,
-                                  child: Expanded(
-                                    child: RotatedBox(
-                                      quarterTurns: 3,
-                                      child: Slider(
-                                        value: cameraZoom,
-                                        label: '$cameraZoom',
-                                        min: minZoomLevel,
-                                        max: maxZoomLevel,
-                                        activeColor: Colors.grey,
-                                        inactiveColor:
-                                        Colors.grey.withOpacity(0.2),
-                                        onChanged: (newValue) {
-                                          setState(() {
-                                            cameraZoom = newValue;
-                                          });
-                                        },
+                              ),
+                            ),
+                          ),
+                          // left eye
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: _switchCamera,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10.0),
+                                child: Transform.translate(
+                                  offset: Offset(-xOffset, 0),
+                                  child: Transform.rotate(
+                                    angle: (cameraAngle * pi) / 180,
+                                    child: Transform.scale(
+                                      scale: cameraZoom,
+                                      child: FittedBox(
+                                        fit: BoxFit.cover,
+                                        child: SizedBox(
+                                          width: previewWidth,
+                                          height: previewHeight,
+                                          child: CameraPreview(controller!),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                                //right padding
-                                SizedBox(
-                                  width: paddingWidth,
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          //Third block
-                          Positioned(
-                            left: 10,
-                            right: 10,
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  height: sliderWidth * 2,
-                                  width: 10,
-                                ),
-                                Column(
-                                  children: [
-                                    SizedBox(
-                                      height: sliderWidth,
-                                    ),
-                                    Text(
-                                      'Status: $state',
-                                      style:
-                                      TextStyle(color: color, fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: sliderWidth * 2,
-                                ),
-                              ],
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    ],
-                  );
-                }),
+                    ),
+                    // sliders
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        //First el
+                        Positioned(
+                          left: 10,
+                          right: 10,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              SizedBox(width: paddingWidth * 0.1),
+                              // Text for angle
+                              Column(
+                                children: [
+                                  //text offset
+                                  Text(
+                                    xOffset.toStringAsFixed(2),
+                                    style: const TextStyle(
+                                        color: Color.fromARGB(216, 0, 255, 0),
+                                        fontSize: 12),
+                                  ),
+                                  //text angle
+                                  Text(
+                                    cameraAngle.toStringAsFixed(2),
+                                    style: const TextStyle(
+                                        color:
+                                        Color.fromARGB(216, 255, 165, 0),
+                                        fontSize: 16),
+                                  ),
+                                  //test zoom
+                                  Text(
+                                    cameraZoom.toStringAsFixed(2),
+                                    style: const TextStyle(
+                                        color: Color.fromARGB(216, 255, 0, 0),
+                                        fontSize: 16),
+                                  ),
+                                ],
+                              ),
+
+                              SizedBox(width: paddingWidth * 0.1),
+
+                              // Slider for offset
+                              Expanded(
+                                child: Slider(
+                                  value: xOffset,
+                                  activeColor: const Color.fromARGB(
+                                      100, 115, 115, 115),
+                                  inactiveColor: const Color.fromARGB(
+                                      100, 115, 115, 115),
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      xOffset = newValue;
+                                    });
+                                  },
+                                  min: 0,
+                                  max: maxSliderValue,
+                                ),
+                              ),
+                              //padding
+                              SizedBox(width: paddingWidth * 0.8),
+                              // Escape button
+                              IconButton(
+                                iconSize: 20,
+                                icon: const Icon(
+                                  Icons.exit_to_app,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(
+                                    context,
+                                  );
+                                },
+                              ),
+                              SizedBox(width: paddingWidth * 0.1),
+                            ],
+                          ),
+                        ),
+
+                        // Second block
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          // alignment: Alignment.center,
+                          child: Row(
+                            children: <Widget>[
+                              //padding left
+                              SizedBox(
+                                width: paddingWidth * 0.8,
+                              ),
+                              //Slider for rotate
+                              Container(
+                                width: sliderWidth,
+                                alignment: Alignment.centerLeft,
+                                child: Expanded(
+                                  child: RotatedBox(
+                                    quarterTurns: 1,
+                                    child: Slider(
+                                      value: cameraAngle,
+                                      divisions: (maxAngleValue.toInt() -
+                                          minAngleValue.toInt()),
+                                      label: '${cameraAngle.toInt()}',
+                                      activeColor: Colors.grey,
+                                      inactiveColor:
+                                      Colors.grey.withOpacity(0.2),
+                                      onChanged: (dynamic newValue) {
+                                        setState(() {
+                                          cameraAngle = newValue;
+                                        });
+                                      },
+                                      min: minAngleValue,
+                                      max: maxAngleValue,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              //padding for screen view
+                              SizedBox(
+                                  width: previewWidth -
+                                      2 * sliderWidth -
+                                      2 * paddingWidth),
+                              //Slider for camera zoom
+                              Container(
+                                width: sliderWidth,
+                                alignment: Alignment.centerLeft,
+                                child: Expanded(
+                                  child: RotatedBox(
+                                    quarterTurns: 3,
+                                    child: Slider(
+                                      value: cameraZoom,
+                                      label: '$cameraZoom',
+                                      min: minZoomLevel,
+                                      max: maxZoomLevel,
+                                      activeColor: Colors.grey,
+                                      inactiveColor:
+                                      Colors.grey.withOpacity(0.2),
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          cameraZoom = newValue;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              //right padding
+                              SizedBox(
+                                width: paddingWidth,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        //Third block
+                        Positioned(
+                          left: 10,
+                          right: 10,
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                height: sliderWidth * 2,
+                                width: 10,
+                              ),
+                              Column(
+                                children: [
+                                  SizedBox(
+                                    height: sliderWidth,
+                                  ),
+                                  Text(
+                                    'Status: $state',
+                                    style:
+                                    TextStyle(color: color, fontSize: 16),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: sliderWidth * 2,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              }),
           ),
         ],
       ),
