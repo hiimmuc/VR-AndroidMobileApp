@@ -17,7 +17,6 @@ import 'package:talker_flutter/talker_flutter.dart';
 import "package:intl/intl.dart";
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_screen_recording/flutter_screen_recording.dart';
-import 'package:open_file/open_file.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,10 +54,8 @@ class Homepage extends StatefulWidget {
 
 class _Homepage extends State<Homepage> {
   // const Homepage({super.key});
-  bool _recording = false;
   bool _exporting = false;
   bool recording = false;
-  final int _time = 0;
 
   // final ScreenRecorderController _controller = ScreenRecorderController();
   // bool get canExport => _controller.exporter.hasFrames;
@@ -917,7 +914,7 @@ class IMU_widget extends StatelessWidget {
 
   final int? _magnetometerLastInterval;
 
-  IMU_widget(
+  const IMU_widget(
       this._userAccelerometerEvent,
       this._accelerometerEvent,
       this._gyroscopeEvent,
@@ -928,7 +925,7 @@ class IMU_widget extends StatelessWidget {
       this._magnetometerLastInterval,
       {super.key});
 
-  double textSize = 8;
+  final double textSize = 8;
 
   @override
   Widget build(BuildContext context) {
@@ -1081,7 +1078,7 @@ class BluetoothScreen extends StatelessWidget {
           builder: (c, snapshot) {
             final state = snapshot.data;
             if (state == BluetoothAdapterState.on) {
-              return Homepage();
+              return const Homepage();
             }
             return BluetoothOffScreen(state: state);
           }),

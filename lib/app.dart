@@ -1,8 +1,5 @@
-// ignore_for_file: prefer_interpolation_to_compose_strings
-
 import 'package:flutter/material.dart';
 
-import 'package:VRHuRoLab/UI/IMU.dart';
 import 'package:VRHuRoLab/UI/bluetooth.dart';
 import 'package:VRHuRoLab/UI/homepage.dart';
 import 'package:VRHuRoLab/UI/camera_view.dart';

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 
 class BluetoothScreen extends StatelessWidget {
-  final StatefulWidget nextpage;
-  const BluetoothScreen(this.nextpage, {super.key});
+  final StatefulWidget nextPage;
+  const BluetoothScreen(this.nextPage, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class BluetoothScreen extends StatelessWidget {
           builder: (c, snapshot) {
             final state = snapshot.data;
             if (state == BluetoothAdapterState.on) {
-              return this.nextpage;
+              return nextPage;
             }
             return BluetoothOffScreen(state: state);
           }),

@@ -1,11 +1,12 @@
 import 'dart:math';
-import 'package:VRHuRoLab/UI/IMU.dart';
+import 'package:VRHuRoLab/UI/imu_view.dart';
 import 'package:VRHuRoLab/UI/homepage.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:screenshot/screenshot.dart';
 
 
 class CameraScreen extends StatefulWidget {
@@ -40,6 +41,12 @@ class _CameraScreenState extends State<CameraScreen> {
   //Keyboard
   final FocusNode _focusNode = FocusNode();
   bool recording = false;
+
+  // String time = timestamp();
+  //
+  // Uint8List _imageFile;
+  ScreenshotController screenshotController = ScreenshotController();
+
   // Handles the key events from the Focus widget and updates the
 
   KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
@@ -141,9 +148,10 @@ class _CameraScreenState extends State<CameraScreen> {
     previewWidth = mediaQueryData.size.width;
     previewHeight = mediaQueryData.size.height * 1.5;
 
-    Color color = Colors.white;
-    var state = "Recording: $isRecording | Streaming: $isStreaming";
-    // startCameraRecording();
+    Color isRecordingColor = setColorState(isRecording);
+    String isRecordingState = isRecording ? "On" : "Off";
+    Color isStreamingColor = setColorState(isStreaming);
+    String isStreamingState = isStreaming ? "On" : "Off";
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -374,6 +382,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
                         //Third block
                         Positioned(
+                          bottom: 0,
                           left: 10,
                           right: 10,
                           child: Row(
@@ -387,11 +396,30 @@ class _CameraScreenState extends State<CameraScreen> {
                                   SizedBox(
                                     height: sliderWidth,
                                   ),
-                                  Text(
-                                    'Status: $state',
-                                    style:
-                                    TextStyle(color: color, fontSize: 16),
-                                  ),
+                                  Row(
+                                    children: [
+                                      const Text(
+                                        "Recording: ",
+                                        style:
+                                        TextStyle(color: Colors.white, fontSize: 12),
+                                      ),
+                                      Text(
+                                        "$isRecordingState | ",
+                                        style:
+                                        TextStyle(color: isRecordingColor, fontSize: 12),
+                                      ),
+                                      const Text(
+                                        "Streaming: ",
+                                        style:
+                                        TextStyle(color: Colors.white, fontSize: 12),
+                                      ),
+                                      Text(
+                                        "$isStreamingState | ",
+                                        style:
+                                        TextStyle(color: isStreamingColor, fontSize: 12),
+                                      ),
+                                    ],
+                                  )
                                 ],
                               ),
                               SizedBox(
@@ -417,6 +445,17 @@ class _CameraScreenState extends State<CameraScreen> {
     _focusNode.dispose();
     super.dispose();
   }
+
+  Color setColorState(bool state) {
+    if (state){
+      return Colors.greenAccent;
+    }
+    else{
+      return Colors.redAccent;
+    }
+
+  }
+
 }
 
 class WhiteLine extends StatelessWidget {

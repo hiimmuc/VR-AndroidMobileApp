@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-import 'package:talker_flutter/talker_flutter.dart';
 import "package:intl/intl.dart";
 
 String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
@@ -15,13 +14,13 @@ class IMU extends StatefulWidget {
 }
 
 class _IMU_widget extends State<IMU> {
-  late String time;
+  String time = timestamp();
   // Log file
   // final talker = TalkerFlutter.init();
   File file = File(
-      "/storage/emulated/0/Download/VR_logs/log_imu_${timestamp()}.txt");
+      "/storage/emulated/0/Download/VR_logs/imu/log_imu_${timestamp()}.txt");
 
-  static const Duration _ignoreDuration = Duration(milliseconds: 20);
+  static const Duration _ignoreDuration = Duration(milliseconds: 10);
 
   UserAccelerometerEvent? _userAccelerometerEvent;
   AccelerometerEvent? _accelerometerEvent;
@@ -39,28 +38,16 @@ class _IMU_widget extends State<IMU> {
   int? _magnetometerLastInterval;
   final _streamSubscriptions = <StreamSubscription<dynamic>>[];
 
-  Duration sensorInterval = SensorInterval.normalInterval;
+  Duration sensorInterval = const Duration(milliseconds: 33, microseconds: 333);// normal (200) ui (70) game(20)
   double textSize = 8;
   @override
   Widget build(BuildContext context) {
-    time = DateFormat('yyyy-MM-dd hh:mm:ss').format(DateTime.now()).toString();
+    time = _userAccelerometerUpdateTime.toString();
 
     // Verbose log console
-    var logMsg = """"$time, 
-    ${_userAccelerometerEvent!.x.toStringAsFixed(1)}, 
-    ${_userAccelerometerEvent!.y.toStringAsFixed(1)}, 
-    ${_userAccelerometerEvent!.z.toStringAsFixed(1)}, 
-    ${_accelerometerEvent!.x.toStringAsFixed(1)}, 
-    ${_accelerometerEvent!.y.toStringAsFixed(1)}, 
-    ${_accelerometerEvent!.z.toStringAsFixed(1)}, 
-    ${_gyroscopeEvent!.x.toStringAsFixed(1)}, 
-    ${_gyroscopeEvent!.y.toStringAsFixed(1)}, 
-    ${_gyroscopeEvent!.z.toStringAsFixed(1)}, 
-    ${_magnetometerEvent!.x.toStringAsFixed(1)}, 
-    ${_magnetometerEvent!.y.toStringAsFixed(1)},      
-    ${_magnetometerEvent!.z.toStringAsFixed(1)}, 
-    """;
+    var logMsg = "$time, ${_userAccelerometerEvent!.x.toStringAsFixed(1)}, ${_userAccelerometerEvent!.y.toStringAsFixed(1)}, ${_userAccelerometerEvent!.z.toStringAsFixed(1)}, ${_accelerometerEvent!.x.toStringAsFixed(1)}, ${_accelerometerEvent!.y.toStringAsFixed(1)}, ${_accelerometerEvent!.z.toStringAsFixed(1)}, ${_gyroscopeEvent!.x.toStringAsFixed(1)}, ${_gyroscopeEvent!.y.toStringAsFixed(1)}, ${_gyroscopeEvent!.z.toStringAsFixed(1)}, ${_magnetometerEvent!.x.toStringAsFixed(1)}, ${_magnetometerEvent!.y.toStringAsFixed(1)}, ${_magnetometerEvent!.z.toStringAsFixed(1)}";
     // talker.info(logMsg);
+
     file.writeAsString(logMsg, mode: FileMode.writeOnlyAppend);
     return IMU_widget(
         _userAccelerometerEvent = _userAccelerometerEvent,
@@ -70,7 +57,8 @@ class _IMU_widget extends State<IMU> {
         _accelerometerLastInterval = _accelerometerLastInterval,
         _userAccelerometerLastInterval = _userAccelerometerLastInterval,
         _gyroscopeLastInterval = _gyroscopeLastInterval,
-        _magnetometerLastInterval = _magnetometerLastInterval);
+        _magnetometerLastInterval = _magnetometerLastInterval,
+        _userAccelerometerUpdateTime = _userAccelerometerUpdateTime);
   }
 
   @override
@@ -220,7 +208,9 @@ class IMU_widget extends StatelessWidget {
 
   final int? _magnetometerLastInterval;
 
-  IMU_widget(
+  final DateTime? _userAccelerometerUpdateTime;
+
+  const IMU_widget(
       this._userAccelerometerEvent,
       this._accelerometerEvent,
       this._gyroscopeEvent,
@@ -229,14 +219,27 @@ class IMU_widget extends StatelessWidget {
       this._accelerometerLastInterval,
       this._gyroscopeLastInterval,
       this._magnetometerLastInterval,
+      this._userAccelerometerUpdateTime,
       {super.key});
 
-  double textSize = 8;
+  final double textSize = 8;
 
   @override
   Widget build(BuildContext context) {
     return //IMU
-      Positioned(
+      Stack(children: [
+        Positioned(
+            bottom: 18,
+            left: -200,
+            right: 0,
+            child: Container(
+              alignment: Alignment.bottomCenter,
+              child: Text(
+                _userAccelerometerUpdateTime.toString(),
+                style: const TextStyle(color: Colors.lightBlue, fontSize: 12),
+              ),
+            )),
+        Positioned(
         bottom: 0,
         left: 500,
         right: 30,
@@ -325,6 +328,9 @@ class IMU_widget extends StatelessWidget {
             ],
           ),
         ),
-      );
+      )
+      ],
+    );
+
   }
 }

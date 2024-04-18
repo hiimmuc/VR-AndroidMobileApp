@@ -24,7 +24,7 @@ class FileStorage {
     if (kDebugMode) {
       print(exPath.toString());
     }
-    await Directory("$exPath/VR_logs/").create(recursive: true);
+    await Directory("$exPath/VR_logs/imu/").create(recursive: true);
     return exPath;
   }
 

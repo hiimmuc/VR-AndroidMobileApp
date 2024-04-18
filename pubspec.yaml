@@ -71,6 +71,10 @@ dependencies:
   ed_screen_recorder: ^0.0.14
   gallery_saver_plus: ^3.0.1
   flutter_riverpod: ^2.5.1
+  screenshot: ^2.3.0
+  device_apps: ^2.2.0
+  url_launcher: ^6.2.6
+  android_intent: ^2.0.2
 
 dev_dependencies:
   flutter_test:

@@ -6,6 +6,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rtmp_broadcaster/camera.dart';
@@ -13,10 +14,10 @@ import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 class CameraExampleHome extends StatefulWidget {
+  const CameraExampleHome({super.key});
+
   @override
-  _CameraExampleHomeState createState() {
-    return _CameraExampleHomeState();
-  }
+  _CameraExampleHomeState createState() => _CameraExampleHomeState();
 }
 
 /// Returns a suitable camera icon for [direction].
@@ -43,7 +44,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
   VoidCallback? videoPlayerListener;
   bool enableAudio = true;
   bool useOpenGL = true;
-  final TextEditingController _textFieldController = TextEditingController(text: "rtsp://163.221.194.188/live/vrstream");
+  final TextEditingController _textFieldController = TextEditingController(text: "rtmp://163.221.194.188/live/vrstream");
 
   bool get isStreaming => controller?.value.isStreamingVideoRtmp ?? false;
 
@@ -120,17 +121,17 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
         children: <Widget>[
           Expanded(
             child: Container(
-              child: Padding(
-                padding: const EdgeInsets.all(1.0),
-                child: Center(
-                  child: _cameraPreviewWidget(),
-                ),
-              ),
               decoration: BoxDecoration(
                 color: Colors.black,
                 border: Border.all(
                   color: color,
                   width: 3.0,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(1.0),
+                child: Center(
+                  child: _cameraPreviewWidget(),
                 ),
               ),
             ),
@@ -203,16 +204,16 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
             videoController == null && imagePath == null
                 ? Container()
                 : SizedBox(
+              width: 64.0,
+              height: 64.0,
               child: (videoController == null)
                   ? Image.file(File(imagePath!))
                   : Container(
+                decoration: BoxDecoration(border: Border.all(color: Colors.pink)),
                 child: Center(
                   child: AspectRatio(aspectRatio: videoController!.value.aspectRatio, child: VideoPlayer(videoController!)),
                 ),
-                decoration: BoxDecoration(border: Border.all(color: Colors.pink)),
               ),
-              width: 64.0,
-              height: 64.0,
             ),
           ],
         ),
@@ -244,7 +245,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
           onPressed: controller != null && isControllerInitialized && !isStreamingVideoRtmp ? onVideoStreamingButtonPressed : null,
         ),
         IconButton(
-          icon: controller != null && (isRecordingPaused || isStreamingPaused) ? Icon(Icons.play_arrow) : Icon(Icons.pause),
+          icon: controller != null && (isRecordingPaused || isStreamingPaused) ? const Icon(Icons.play_arrow) : const Icon(Icons.pause),
           color: Colors.blue,
           onPressed: controller != null && isControllerInitialized && (isRecordingVideo || isStreamingVideoRtmp)
               ? (controller != null && (isRecordingPaused || isStreamingPaused) ? onResumeButtonPressed : onPauseButtonPressed)
@@ -315,14 +316,18 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
         } else {
           try {
             final Map<dynamic, dynamic> event = controller!.value.event as Map<dynamic, dynamic>;
-            print('Event $event');
+            if (kDebugMode) {
+              print('Event $event');
+            }
             final String eventType = event['eventType'] as String;
             if (isVisible && isStreaming && eventType == 'rtmp_retry') {
               showInSnackBar('BadName received, endpoint in use.');
               await stopVideoStreaming();
             }
           } catch (e) {
-            print(e);
+            if (kDebugMode) {
+              print(e);
+            }
           }
         }
       }
@@ -377,7 +382,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
   }
 
   void onStopButtonPressed() {
-    if (this.isStreamingVideoRtmp) {
+    if (isStreamingVideoRtmp) {
       stopVideoStreaming().then((_) {
         if (mounted) setState(() {});
         showInSnackBar('Video streamed to: $url');
@@ -456,14 +461,14 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
 
   Future<void> stopVideoRecording() async {
     if (!isRecordingVideo) {
-      return null;
+      return;
     }
 
     try {
       await controller!.stopVideoRecording();
     } on CameraException catch (e) {
       _showCameraException(e);
-      return null;
+      return;
     }
 
     await _startVideoPlayer();
@@ -481,7 +486,9 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
       _showCameraException(e);
       rethrow;
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
@@ -497,7 +504,9 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
       _showCameraException(e);
       rethrow;
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
@@ -509,15 +518,15 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Url to Stream to'),
+            title: const Text('Url to Stream to'),
             content: TextField(
               controller: _textFieldController,
-              decoration: InputDecoration(hintText: "Url to Stream to"),
+              decoration: const InputDecoration(hintText: "Url to Stream to"),
               onChanged: (String str) => result = str,
             ),
             actions: <Widget>[
               TextButton(
-                child: new Text(MaterialLocalizations.of(context).cancelButtonLabel),
+                child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -600,13 +609,13 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
       await controller!.stopVideoStreaming();
     } on CameraException catch (e) {
       _showCameraException(e);
-      return null;
+      return;
     }
   }
 
   Future<void> pauseVideoStreaming() async {
     if (!isStreamingVideoRtmp) {
-      return null;
+      return;
     }
 
     try {
@@ -619,7 +628,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
 
   Future<void> resumeVideoStreaming() async {
     if (!isStreamingVideoRtmp) {
-      return null;
+      return;
     }
 
     try {
@@ -683,9 +692,11 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
 }
 
 class CameraApp extends StatelessWidget {
+  const CameraApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: CameraExampleHome(),
     );
   }
@@ -701,5 +712,5 @@ Future<void> main() async {
   } on CameraException catch (e) {
     logError(e.code, e.description ?? "No description found");
   }
-  runApp(CameraApp());
+  runApp(const CameraApp());
 }
