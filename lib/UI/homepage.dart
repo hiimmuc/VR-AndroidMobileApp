@@ -10,8 +10,8 @@ import 'package:device_apps/device_apps.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:ed_screen_recorder/ed_screen_recorder.dart';
-
+// import 'package:ed_screen_recorder/ed_screen_recorder.dart';
+import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 
 void logError(String code, String message) =>
     print('Error: $code\nError Message: $message');
@@ -35,14 +35,14 @@ class _Homepage extends State<Homepage> {
 
   final StatefulWidget CameraScreen;
 
-  EdScreenRecorder screenRecorder = EdScreenRecorder();
-  RecordOutput? response;
+  // EdScreenRecorder screenRecorder = EdScreenRecorder();
+  // RecordOutput? response;
   bool inProgress = false;
 
   _Homepage(this.CameraScreen);
 
-  Future<void> startScreenRecord(bool audio, String fileName, int width, int height) async {
-    await Future.delayed(const Duration(milliseconds: 20));
+  Future<bool> startScreenRecord(bool audio, String fileName, int width, int height) async {
+
     // var status = await Permission.storage.status;
     // if (!status.isGranted) {
     //   // If not we will ask for permission first
@@ -61,64 +61,66 @@ class _Homepage extends State<Homepage> {
     // }
     // await Directory("$exPath/VR_logs/video/").create(recursive: true);
     // String savedDirPath = "$exPath/VR_logs/video/";
-    var savedDir =  await getApplicationDocumentsDirectory();
-    String savedDirPath = savedDir.path;
+    // var savedDir =  await getApplicationDocumentsDirectory();
+    // String savedDirPath = savedDir.path;
+    // try {
+    //   var startResponse = await screenRecorder.startRecordScreen(
+    //     fileName: fileName,
+    //     //Optional. It will save the video there when you give the file path with whatever you want.
+    //     //If you leave it blank, the Android operating system will save it to the gallery.
+    //     dirPathToSave: savedDirPath,
+    //     audioEnable: audio,
+    //     width: width,
+    //     height: height,
+    //   );
+    //   setState(() {
+    //     response = startResponse;
+    //   });
+    // } on PlatformException {
+    //   kDebugMode ? debugPrint("Error: An error occurred while starting the recording!") : null;
+    // }
+    // return response;
     // save path: /storage/emulated/0/Download/<App name>/<filename>.mp4
     // Reason for saving file in that path: https://github.com/Isvisoft/flutter_screen_recording/blob/9c1639011ff37055311f5ff4dc27d1be9d8cea58/flutter_screen_recording/android/src/main/kotlin/com/isvisoft/flutter_screen_recording/FlutterScreenRecordingPlugin.kt
-    // if (audio) {
-    //   start = await FlutterScreenRecording.startRecordScreenAndAudio(
-    //       filename,
-    //       titleNotification: "Saving recording",
-    //       messageNotification: "Saving recording");
-    // } else {
-    //   start = await FlutterScreenRecording.startRecordScreen(filename,
-    //       titleNotification: "Saving recording",
-    //       messageNotification: "Saving recording");
-    // }
-    try {
-      var startResponse = await screenRecorder.startRecordScreen(
-        fileName: fileName,
-        //Optional. It will save the video there when you give the file path with whatever you want.
-        //If you leave it blank, the Android operating system will save it to the gallery.
-        dirPathToSave: savedDirPath,
-        audioEnable: audio,
-        width: width,
-        height: height,
-      );
-      setState(() {
-        response = startResponse;
-      });
-    } on PlatformException {
-      kDebugMode ? debugPrint("Error: An error occurred while starting the recording!") : null;
+    bool start = false;
+    if (audio) {
+      start = await FlutterScreenRecording.startRecordScreenAndAudio(
+          fileName,
+          titleNotification: "Saving recording",
+          messageNotification: "Saving recording");
+    } else {
+      start = await FlutterScreenRecording.startRecordScreen(fileName,
+          titleNotification: "Saving recording",
+          messageNotification: "Saving recording");
     }
-    // return response;
+    return start;
   }
 
   Future<void> stopScreenRecord() async {
-    // String lpath = await FlutterScreenRecording.stopRecordScreen;
-    // // if (kDebugMode) {
-    // //   print("Opening video");
-    // // }
+    String lpath = await FlutterScreenRecording.stopRecordScreen;
     // if (kDebugMode) {
-    //   print(lpath);
+    //   print("Opening video");
     // }
-    // GallerySaver.saveVideo(lpath).then((value) {
-    //   if (value != null && value) {
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //         const SnackBar(content: Text("Video Saved Successfully")));
-    //   } else {
-    //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-    //         content: Text("Some error occurred in downloading image")));
-    //   }
-    // });
-    try {
-      var stopResponse = await screenRecorder.stopRecord();
-      setState(() {
-        response = stopResponse;
-      });
-    } on PlatformException {
-      kDebugMode ? debugPrint("Error: An error occurred while stopping recording.") : null;
+    if (kDebugMode) {
+      print(lpath);
     }
+    GallerySaver.saveVideo(lpath).then((value) {
+      if (value != null && value) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Video Saved Successfully to $lpath")));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Some error occurred in downloading image")));
+      }
+    });
+    // try {
+    //   var stopResponse = await screenRecorder.stopRecord();
+    //   setState(() {
+    //     response = stopResponse;
+    //   });
+    // } on PlatformException {
+    //   kDebugMode ? debugPrint("Error: An error occurred while stopping recording.") : null;
+    // }
     // OpenFile.open(lpath);
   }
 
@@ -135,6 +137,10 @@ class _Homepage extends State<Homepage> {
     if (isViewing) {
       title = 'Return page';
     }
+
+    double screenWidth =MediaQuery.of(context).size.width;
+    double sceenHeight =MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(title, style: const TextStyle(fontSize: 24)),
@@ -143,132 +149,156 @@ class _Homepage extends State<Homepage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                if (isExporting)
-                  const Center(child: CircularProgressIndicator())
-                else ...[
-                  if (!isViewing || (!isRecording && !isExporting))
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        // Column(
-                        //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        //   children: [
-                        //     Text("File: ${response?.file.path}"),
-                        //     Text("Status: ${response?.success.toString()}"),
-                        //     Text("Event: ${response?.eventName}"),
-                        //     Text("Progress: ${response?.isProgress.toString()}"),
-                        //     Text("Message: ${response?.message}"),
-                        //     Text("Video Hash: ${response?.videoHash}"),
-                        //     Text("Start Date: ${(response?.startDate).toString()}"),
-                        //     Text("End Date: ${(response?.endDate).toString()}"),
-                        //   ],
-                        // ),
-                        const SizedBox(width: 100,),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            // endif
-                            ElevatedButton(
-                              onPressed: () {
-                                startScreenRecord(false, "screen_${timestamp()}",
-                                    context.size?.width.toInt() ?? 0,
-                                    context.size?.height.toInt() ?? 0);
-                                // openApp('com.oneplus.screenrecord');
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Started video recording")));
-                                setState(() {
-                                  isRecording = true;
-                                });
-                              },
-                              child: const Text('Start recording'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Started video streaming")));
-                                openApp('info.dvkr.screenstream');
-                                setState(() {
-                                  isStreaming = true;
-                                });
-                              },
-                              child: const Text('Start streaming'),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 50,),
-                        if (!isViewing)
-                          FloatingActionButton(
-                            onPressed: () {
-                              FileStorage.writeCounter(headings,
-                                  "log_imu_${timestamp()}.txt");
-                              setState(() {
-                                isViewing = true;
-                              });
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => CameraScreen
-                                ),
-                              );
-                            },
-                            child: const Icon(Icons.arrow_forward),
-                          ),
-                      ],
-                    ),
-                  if (isViewing || (isRecording && !isExporting))
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        const SizedBox(width: 100,),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            if (isRecording && !isExporting)
-                              ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    isExporting = true;
-                                  });
-                                  stopScreenRecord();
-                                  setState(() {
-                                    isExporting = false;
-                                    isRecording = false;
-                                  });
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text("Video Saved Successfully to ${response?.file.path}")));
-                                },
-                                child: const Text('Stop recording'),
-                              ),
-                            if (isViewing)
-                              ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    isViewing = false;
-                                  });
-                                },
-                                child: const Text('Return to Homepage'),
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  //endif
-                ],
-              ],
-            ),
             Container(
-              alignment: Alignment.bottomRight,
-              child: FloatingActionButton.extended(
-                onPressed: () {
-                  SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-                },
-                icon: const Icon(Icons.close_outlined),
-                label: const Text('Exit'),
+              width: screenWidth / 3,
+              alignment: Alignment.topLeft,
+              child:
+              const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Owned by:"),
+                  Text("Human robotics laboratory"),
+                  Text("NAIST"),
+                  Text("Version: 20240419"),
+                  Text("Developed by MuC"),
+                  Text("Saved files:"),
+                  Text("- IMU: Download/VR_logs/imu/"),
+                  Text("- Videos: "),
+                ],
               ),
             ),
+            Container(
+              width: screenWidth / 3,
+              alignment: Alignment.topCenter,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  if (isExporting)
+                    const Center(child: CircularProgressIndicator())
+                  else ...[
+                    if ((!isRecording || !isStreaming) && !isExporting)
+                      if (!isRecording)
+                        ElevatedButton(
+                          onPressed: () {
+                            startScreenRecord(false, "screen_${timestamp()}",
+                                context.size?.width.toInt() ?? 0,
+                                context.size?.height.toInt() ?? 0);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Started video recording")));
+                            setState(() {
+                              isRecording = true;
+                            });
+                          },
+                          child: const Text('Start recording'),
+                        ),
+                      if (!isStreaming)
+                        ElevatedButton(
+                          onPressed: () {
+                            startStreaming();
+                            setState(() {
+                              isStreaming = true;
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Started video streaming")));
+                          },
+                          child: const Text('Start streaming'),
+                        ),
+                    // endif
+                    if (isRecording && !isExporting)
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            isExporting = true;
+                          });
+                          stopScreenRecord();
+                          setState(() {
+                            isExporting = false;
+                            isRecording = false;
+                          });
+                          // ScaffoldMessenger.of(context).showSnackBar(
+                          //     SnackBar(content: Text("Video Saved Successfully")));
+                        },
+                        child: const Text('Stop recording'),
+                      ),
+                    if (isStreaming)
+                      ElevatedButton(
+                        onPressed: () {
+                          stopStreaming();
+                          setState(() {
+                            isStreaming = false;
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Stopped streaming Successfully")));
+                        },
+                        child: const Text('Stop Streaming'),
+                      ),
+                    if (isViewing)
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            isViewing = false;
+                          });
+                        },
+                        child: const Text('Return to Homepage'),
+                      ),
+                    //endif
+                  ],
+                  ElevatedButton(
+                    onPressed: () {
+                      openApp("com.oneplus.filemanager");
+                    },
+                    child: const Text('Open FileManager'),
+                  )
+                ],
+              ),
+            ),
+            Container(
+              width: screenWidth / 3,
+              alignment: Alignment.topRight,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Image(
+                      width: screenWidth / 5,
+                      height: sceenHeight / 5,
+                      image: const AssetImage('assets/images/HuRoLabIcon.png')),
+                  if (!isViewing)
+                    Container(
+                      width: screenWidth / 5,
+                      height: sceenHeight / 8,
+                      child: FloatingActionButton.extended(
+                        onPressed: () {
+                          FileStorage.writeCounter(headings,
+                              "log_imu_${timestamp()}.txt");
+                          setState(() {
+                            isViewing = true;
+                          });
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CameraScreen
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.arrow_forward),
+                        label: const Text('Start'),
+                      ),
+                    )
+                  else
+                    SizedBox(width: screenWidth/5),
+                  Container(
+                    alignment: Alignment.bottomCenter,
+                    child: FloatingActionButton.extended(
+                      onPressed: () {
+                        SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+                      },
+                      icon: const Icon(Icons.close_outlined),
+                      label: const Text('Exit'),
+                    ),
+                  ),
+                ],
+              ),
+            )
           ],
         ),
       ),
@@ -293,4 +323,14 @@ Future<void> openApp(String packageName) async {
       print(e);
     }
   }
+}
+
+Future<void> startStreaming() async{
+  await FlutterWindowManager.clearFlags(
+      FlutterWindowManager.FLAG_SECURE);
+  openApp('info.dvkr.screenstream');
+}
+
+Future<void> stopStreaming() async{
+  await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
 }
