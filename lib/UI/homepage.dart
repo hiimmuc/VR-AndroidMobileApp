@@ -22,6 +22,8 @@ bool isViewing = false;
 bool isRecording = false;
 bool isExporting = false;
 bool isStreaming = false;
+const List<String> resolutionList = <String>['Low (320x240)', 'Medium (720x480)', 'High (1280x720)', 'Very High (1920x1080)', 'Ultra High (3840x2160)', 'Max (Highest as possible)'];
+String resolutionChoice = resolutionList.last;
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key, required this.CameraScreen});
@@ -143,7 +145,18 @@ class _Homepage extends State<Homepage> {
 
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(title, style: const TextStyle(fontSize: 24)),
+        backgroundColor: Colors.grey,
+        leading: Image(
+            width: screenWidth / 5,
+            height: sceenHeight / 5,
+            image: const AssetImage('assets/images/HuRoLabIcon.png')),
+        actions: [
+          IconButton(onPressed: (){
+            SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+          }, icon: const Icon(Icons.exit_to_app_rounded))
+        ],
       ),
       body: Center(
         child: Row(
@@ -156,14 +169,14 @@ class _Homepage extends State<Homepage> {
               const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Owned by:"),
+                  Text("Powered by:"),
                   Text("Human robotics laboratory"),
                   Text("NAIST"),
                   Text("Version: 20240419"),
                   Text("Developed by MuC"),
                   Text("Saved files:"),
-                  Text("- IMU: Download/VR_logs/imu/"),
-                  Text("- Videos: "),
+                  Text(" IMU: Download/VR_logs/imu/"),
+                  Text(" Videos: gallery"),
                 ],
               ),
             ),
@@ -258,14 +271,26 @@ class _Homepage extends State<Homepage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Image(
-                      width: screenWidth / 5,
-                      height: sceenHeight / 5,
-                      image: const AssetImage('assets/images/HuRoLabIcon.png')),
+                  const Text("Camera resolution settings:"),
+                  DropdownMenu<String>(
+                    width: screenWidth/4,
+                    initialSelection: resolutionList.last,
+                    onSelected: (String? value) {
+                      // This is called when the user selects an item.
+                      setState(() {
+                        resolutionChoice = value!;
+                      });
+                    },
+                    dropdownMenuEntries: resolutionList.map<DropdownMenuEntry<String>>((String value) {
+                      return DropdownMenuEntry<String>(
+                        value: value,
+                        label: value,
+                      );
+                    }).toList(),
+                  ),
                   if (!isViewing)
                     Container(
-                      width: screenWidth / 5,
-                      height: sceenHeight / 8,
+                      alignment: Alignment.center,
                       child: FloatingActionButton.extended(
                         onPressed: () {
                           FileStorage.writeCounter(headings,
@@ -285,20 +310,10 @@ class _Homepage extends State<Homepage> {
                       ),
                     )
                   else
-                    SizedBox(width: screenWidth/5),
-                  Container(
-                    alignment: Alignment.bottomCenter,
-                    child: FloatingActionButton.extended(
-                      onPressed: () {
-                        SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-                      },
-                      icon: const Icon(Icons.close_outlined),
-                      label: const Text('Exit'),
-                    ),
-                  ),
-                ],
-              ),
-            )
+                    const SizedBox(),
+                  ],
+                ),
+              )
           ],
         ),
       ),

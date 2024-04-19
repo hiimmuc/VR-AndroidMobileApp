@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:math';
 import 'package:VRHuRoLab/UI/imu_view.dart';
 import 'package:VRHuRoLab/UI/homepage.dart';
@@ -8,6 +9,15 @@ import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:screenshot/screenshot.dart';
 
+// ['Low (320x240)', 'Medium (720x480)', 'High (1280x720)', 'Very High (1920x1080)', 'Ultra High (3840x2160)', 'Max (Highest as possible)']
+final Map<String, ResolutionPreset> resolutionSelections = {
+  'Low (320x240)': ResolutionPreset.low,
+  'Medium (720x480)': ResolutionPreset.medium,
+  'High (1280x720)': ResolutionPreset.high,
+  'Very High (1920x1080)': ResolutionPreset.veryHigh,
+  'Ultra High (3840x2160)': ResolutionPreset.ultraHigh,
+  'Max (Highest as possible)': ResolutionPreset.max,
+};
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -93,18 +103,26 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   void _initCameraController(CameraDescription cameraDescription) async {
-    if (controller != null) {
-      await controller!.dispose();
-    }
-    var status = await Permission.storage.status;
-    if (!status.isGranted) {
+    var storageStatus = await Permission.storage.status;
+    if (!storageStatus.isGranted) {
       // If not we will ask for permission first
       await Permission.storage.request();
     }
+
+    var cameraStatus = await Permission.camera.status;
+    if (!cameraStatus.isGranted) {
+      // If not we will ask for permission first
+      await Permission.camera.request();
+    }
+
+    if (controller != null) {
+      await controller!.dispose();
+    }
+
     // set camera property here
     controller = CameraController(
       cameraDescription,
-      ResolutionPreset.max,
+      resolutionSelections[resolutionChoice]!,
       enableAudio: false,
     );
 
@@ -232,201 +250,185 @@ class _CameraScreenState extends State<CameraScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         //First el
-                        Positioned(
-                          left: 10,
-                          right: 10,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              SizedBox(width: paddingWidth * 0.1),
-                              // Text for angle
-                              Column(
-                                children: [
-                                  //text offset
-                                  Text(
-                                    xOffset.toStringAsFixed(2),
-                                    style: const TextStyle(
-                                        color: Color.fromARGB(216, 0, 255, 0),
-                                        fontSize: 12),
-                                  ),
-                                  //text angle
-                                  Text(
-                                    cameraAngle.toStringAsFixed(2),
-                                    style: const TextStyle(
-                                        color:
-                                        Color.fromARGB(216, 255, 165, 0),
-                                        fontSize: 16),
-                                  ),
-                                  //test zoom
-                                  Text(
-                                    cameraZoom.toStringAsFixed(2),
-                                    style: const TextStyle(
-                                        color: Color.fromARGB(216, 255, 0, 0),
-                                        fontSize: 16),
-                                  ),
-                                ],
-                              ),
-
-                              SizedBox(width: paddingWidth * 0.1),
-
-                              // Slider for offset
-                              Expanded(
-                                child: Slider(
-                                  value: xOffset,
-                                  activeColor: const Color.fromARGB(
-                                      100, 115, 115, 115),
-                                  inactiveColor: const Color.fromARGB(
-                                      100, 115, 115, 115),
-                                  onChanged: (newValue) {
-                                    setState(() {
-                                      xOffset = newValue;
-                                    });
-                                  },
-                                  min: 0,
-                                  max: maxSliderValue,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            SizedBox(width: paddingWidth * 0.1),
+                            // Text for angle
+                            Column(
+                              children: [
+                                //text offset
+                                Text(
+                                  xOffset.toStringAsFixed(2),
+                                  style: const TextStyle(
+                                      color: Color.fromARGB(216, 0, 255, 0),
+                                      fontSize: 12),
                                 ),
-                              ),
-                              //padding
-                              SizedBox(width: paddingWidth * 0.8),
-                              // Escape button
-                              IconButton(
-                                iconSize: 20,
-                                icon: const Icon(
-                                  Icons.exit_to_app,
-                                  color: Colors.white,
+                                //text angle
+                                Text(
+                                  cameraAngle.toStringAsFixed(2),
+                                  style: const TextStyle(
+                                      color:
+                                      Color.fromARGB(216, 255, 165, 0),
+                                      fontSize: 16),
                                 ),
-                                onPressed: () {
-                                  Navigator.pop(
-                                    context,
-                                  );
+                                //test zoom
+                                Text(
+                                  cameraZoom.toStringAsFixed(2),
+                                  style: const TextStyle(
+                                      color: Color.fromARGB(216, 255, 0, 0),
+                                      fontSize: 16),
+                                ),
+                              ],
+                            ),
+
+                            SizedBox(width: paddingWidth * 0.1),
+
+                            // Slider for offset
+                            Expanded(
+                              child: Slider(
+                                value: xOffset,
+                                activeColor: const Color.fromARGB(
+                                    100, 115, 115, 115),
+                                inactiveColor: const Color.fromARGB(
+                                    100, 115, 115, 115),
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    xOffset = newValue;
+                                  });
                                 },
+                                min: 0,
+                                max: maxSliderValue,
                               ),
-                              SizedBox(width: paddingWidth * 0.1),
-                            ],
-                          ),
+                            ),
+                            //padding
+                            SizedBox(width: paddingWidth * 0.8),
+                            // Escape button
+                            IconButton(
+                              iconSize: 20,
+                              icon: const Icon(
+                                Icons.exit_to_app,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                Navigator.pop(
+                                  context,
+                                );
+                              },
+                            ),
+                            SizedBox(width: paddingWidth * 0.1),
+                          ],
                         ),
-
                         // Second block
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          // alignment: Alignment.center,
-                          child: Row(
-                            children: <Widget>[
-                              //padding left
-                              SizedBox(
-                                width: paddingWidth * 0.8,
-                              ),
-                              //Slider for rotate
-                              Container(
-                                width: sliderWidth,
-                                alignment: Alignment.centerLeft,
-                                child: Expanded(
-                                  child: RotatedBox(
-                                    quarterTurns: 1,
-                                    child: Slider(
-                                      value: cameraAngle,
-                                      divisions: (maxAngleValue.toInt() -
-                                          minAngleValue.toInt()),
-                                      label: '${cameraAngle.toInt()}',
-                                      activeColor: Colors.grey,
-                                      inactiveColor:
-                                      Colors.grey.withOpacity(0.2),
-                                      onChanged: (dynamic newValue) {
-                                        setState(() {
-                                          cameraAngle = newValue;
-                                        });
-                                      },
-                                      min: minAngleValue,
-                                      max: maxAngleValue,
-                                    ),
+                        Row(
+                          children: <Widget>[
+                            //padding left
+                            SizedBox(
+                              width: paddingWidth * 0.8,
+                            ),
+                            //Slider for rotate
+                            Container(
+                              width: sliderWidth,
+                              alignment: Alignment.centerLeft,
+                              child: Expanded(
+                                child: RotatedBox(
+                                  quarterTurns: 1,
+                                  child: Slider(
+                                    value: cameraAngle,
+                                    divisions: (maxAngleValue.toInt() -
+                                        minAngleValue.toInt()),
+                                    label: '${cameraAngle.toInt()}',
+                                    activeColor: Colors.grey,
+                                    inactiveColor:
+                                    Colors.grey.withOpacity(0.2),
+                                    onChanged: (dynamic newValue) {
+                                      setState(() {
+                                        cameraAngle = newValue;
+                                      });
+                                    },
+                                    min: minAngleValue,
+                                    max: maxAngleValue,
                                   ),
                                 ),
                               ),
-                              //padding for screen view
-                              SizedBox(
-                                  width: previewWidth -
-                                      2 * sliderWidth -
-                                      2 * paddingWidth),
-                              //Slider for camera zoom
-                              Container(
-                                width: sliderWidth,
-                                alignment: Alignment.centerLeft,
-                                child: Expanded(
-                                  child: RotatedBox(
-                                    quarterTurns: 3,
-                                    child: Slider(
-                                      value: cameraZoom,
-                                      label: '$cameraZoom',
-                                      min: minZoomLevel,
-                                      max: maxZoomLevel,
-                                      activeColor: Colors.grey,
-                                      inactiveColor:
-                                      Colors.grey.withOpacity(0.2),
-                                      onChanged: (newValue) {
-                                        setState(() {
-                                          cameraZoom = newValue;
-                                        });
-                                      },
-                                    ),
+                            ),
+                            //padding for screen view
+                            SizedBox(
+                                width: previewWidth -
+                                    2 * sliderWidth -
+                                    2 * paddingWidth),
+                            //Slider for camera zoom
+                            Container(
+                              width: sliderWidth,
+                              alignment: Alignment.centerLeft,
+                              child: Expanded(
+                                child: RotatedBox(
+                                  quarterTurns: 3,
+                                  child: Slider(
+                                    value: cameraZoom,
+                                    label: '$cameraZoom',
+                                    min: minZoomLevel,
+                                    max: maxZoomLevel,
+                                    activeColor: Colors.grey,
+                                    inactiveColor:
+                                    Colors.grey.withOpacity(0.2),
+                                    onChanged: (newValue) {
+                                      setState(() {
+                                        cameraZoom = newValue;
+                                      });
+                                    },
                                   ),
                                 ),
                               ),
-                              //right padding
-                              SizedBox(
-                                width: paddingWidth,
-                              ),
-                            ],
-                          ),
+                            ),
+                            //right padding
+                            SizedBox(
+                              width: paddingWidth,
+                            ),
+                          ],
                         ),
-
                         //Third block
-                        Positioned(
-                          bottom: 0,
-                          left: 10,
-                          right: 10,
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                height: sliderWidth * 2,
-                                width: 10,
-                              ),
-                              Column(
-                                children: [
-                                  SizedBox(
-                                    height: sliderWidth,
-                                  ),
-                                  Row(
-                                    children: [
-                                      const Text(
-                                        "Recording: ",
-                                        style:
-                                        TextStyle(color: Colors.white, fontSize: 12),
-                                      ),
-                                      Text(
-                                        "$isRecordingState | ",
-                                        style:
-                                        TextStyle(color: isRecordingColor, fontSize: 12),
-                                      ),
-                                      const Text(
-                                        "Streaming: ",
-                                        style:
-                                        TextStyle(color: Colors.white, fontSize: 12),
-                                      ),
-                                      Text(
-                                        "$isStreamingState | ",
-                                        style:
-                                        TextStyle(color: isStreamingColor, fontSize: 12),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                              SizedBox(
-                                height: sliderWidth * 2,
-                              ),
-                            ],
-                          ),
+                        Row(
+                          children: [
+                            SizedBox(
+                              height: sliderWidth * 2,
+                              width: 10,
+                            ),
+                            Column(
+                              children: [
+                                SizedBox(
+                                  height: sliderWidth,
+                                ),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      "Recording: ",
+                                      style:
+                                      TextStyle(color: Colors.white, fontSize: 12),
+                                    ),
+                                    Text(
+                                      "$isRecordingState | ",
+                                      style:
+                                      TextStyle(color: isRecordingColor, fontSize: 12),
+                                    ),
+                                    const Text(
+                                      "Streaming: ",
+                                      style:
+                                      TextStyle(color: Colors.white, fontSize: 12),
+                                    ),
+                                    Text(
+                                      "$isStreamingState | ",
+                                      style:
+                                      TextStyle(color: isStreamingColor, fontSize: 12),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                            SizedBox(
+                              height: sliderWidth * 2,
+                            ),
+                          ],
                         ),
                       ],
                     ),

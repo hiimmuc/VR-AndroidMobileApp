@@ -45,7 +45,7 @@ class _IMU_widget extends State<IMU> {
     time = _userAccelerometerUpdateTime.toString();
 
     // Verbose log console
-    var logMsg = "$time, ${_userAccelerometerEvent!.x.toStringAsFixed(1)}, ${_userAccelerometerEvent!.y.toStringAsFixed(1)}, ${_userAccelerometerEvent!.z.toStringAsFixed(1)}, ${_accelerometerEvent!.x.toStringAsFixed(1)}, ${_accelerometerEvent!.y.toStringAsFixed(1)}, ${_accelerometerEvent!.z.toStringAsFixed(1)}, ${_gyroscopeEvent!.x.toStringAsFixed(1)}, ${_gyroscopeEvent!.y.toStringAsFixed(1)}, ${_gyroscopeEvent!.z.toStringAsFixed(1)}, ${_magnetometerEvent!.x.toStringAsFixed(1)}, ${_magnetometerEvent!.y.toStringAsFixed(1)}, ${_magnetometerEvent!.z.toStringAsFixed(1)}";
+    var logMsg = "$time, ${_userAccelerometerEvent?.x}, ${_userAccelerometerEvent?.y}, ${_userAccelerometerEvent?.z}, ${_accelerometerEvent?.x}, ${_accelerometerEvent?.y}, ${_accelerometerEvent?.z}, ${_gyroscopeEvent?.x}, ${_gyroscopeEvent?.y}, ${_gyroscopeEvent?.z}, ${_magnetometerEvent?.x}, ${_magnetometerEvent?.y}, ${_magnetometerEvent?.z}";
     // talker.info(logMsg);
 
     file.writeAsString(logMsg, mode: FileMode.writeOnlyAppend);
