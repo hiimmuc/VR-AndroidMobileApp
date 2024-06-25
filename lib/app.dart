@@ -18,7 +18,7 @@ class VRCameraApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const BluetoothScreen(Homepage(CameraScreen: CameraScreen(),)),
+      home: const BluetoothScreen(const Homepage(CameraScreen: const CameraScreen(),)),
     );
   }
 }

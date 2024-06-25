@@ -68,7 +68,6 @@ dependencies:
   open_file: ^3.3.2
   quiver: ^3.2.1
   flutter_background: ^1.2.0
-  ed_screen_recorder: ^0.0.14
   gallery_saver_plus: ^3.0.1
   flutter_riverpod: ^2.5.1
   screenshot: ^2.3.0

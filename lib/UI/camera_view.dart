@@ -1,13 +1,15 @@
-import 'dart:collection';
 import 'dart:math';
-import 'package:VRHuRoLab/UI/imu_view.dart';
-import 'package:VRHuRoLab/UI/homepage.dart';
 import 'package:camera/camera.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:permission_handler/permission_handler.dart';
-import 'package:screenshot/screenshot.dart';
+
+import 'package:VRHuRoLab/UI/imu_view.dart';
+import 'package:VRHuRoLab/UI/homepage.dart';
+
 
 // ['Low (320x240)', 'Medium (720x480)', 'High (1280x720)', 'Very High (1920x1080)', 'Ultra High (3840x2160)', 'Max (Highest as possible)']
 final Map<String, ResolutionPreset> resolutionSelections = {
@@ -55,7 +57,6 @@ class _CameraScreenState extends State<CameraScreen> {
   // String time = timestamp();
   //
   // Uint8List _imageFile;
-  ScreenshotController screenshotController = ScreenshotController();
 
   // Handles the key events from the Focus widget and updates the
 
@@ -103,14 +104,9 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   void _initCameraController(CameraDescription cameraDescription) async {
-    var storageStatus = await Permission.storage.status;
-    if (!storageStatus.isGranted) {
-      // If not we will ask for permission first
-      await Permission.storage.request();
-    }
 
     var cameraStatus = await Permission.camera.status;
-    if (!cameraStatus.isGranted) {
+    if (!cameraStatus.isGranted || cameraStatus.isDenied) {
       // If not we will ask for permission first
       await Permission.camera.request();
     }
@@ -303,6 +299,7 @@ class _CameraScreenState extends State<CameraScreen> {
                             ),
                             //padding
                             SizedBox(width: paddingWidth * 0.8),
+
                             // Escape button
                             IconButton(
                               iconSize: 20,
@@ -443,8 +440,8 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   void dispose() {
-    controller?.dispose();
     _focusNode.dispose();
+    controller?.dispose();
     super.dispose();
   }
 

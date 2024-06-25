@@ -10,7 +10,7 @@ import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'dart:math';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:io';
-import 'package:ed_screen_recorder/ed_screen_recorder.dart';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:talker_flutter/talker_flutter.dart';
@@ -191,7 +191,6 @@ class _CameraScreenState extends State<CameraScreen> {
   List<CameraDescription>? cameras;
   CameraController? controller;
   CameraDescription? selectedCamera;
-  EdScreenRecorder? screenRecorder;
   // RecordOutput? _response;
   // bool inProgress = false;
 

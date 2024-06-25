@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-import "package:intl/intl.dart";
 
 String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
 

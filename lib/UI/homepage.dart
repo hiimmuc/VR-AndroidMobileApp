@@ -37,51 +37,17 @@ class _Homepage extends State<Homepage> {
 
   final StatefulWidget CameraScreen;
 
-  // EdScreenRecorder screenRecorder = EdScreenRecorder();
-  // RecordOutput? response;
   bool inProgress = false;
 
   _Homepage(this.CameraScreen);
 
   Future<bool> startScreenRecord(bool audio, String fileName, int width, int height) async {
 
-    // var status = await Permission.storage.status;
-    // if (!status.isGranted) {
-    //   // If not we will ask for permission first
-    //   await Permission.storage.request();
-    // }
-    // Directory directory = Directory("");
-    // if (Platform.isAndroid) {
-    //   // Redirects it to download folder in android
-    //   directory = Directory("/storage/emulated/0/Download");
-    // } else {
-    //   directory = await getApplicationDocumentsDirectory();
-    // }
-    // final exPath = directory.path;
-    // if (kDebugMode) {
-    //   print(exPath.toString());
-    // }
-    // await Directory("$exPath/VR_logs/video/").create(recursive: true);
-    // String savedDirPath = "$exPath/VR_logs/video/";
-    // var savedDir =  await getApplicationDocumentsDirectory();
-    // String savedDirPath = savedDir.path;
-    // try {
-    //   var startResponse = await screenRecorder.startRecordScreen(
-    //     fileName: fileName,
-    //     //Optional. It will save the video there when you give the file path with whatever you want.
-    //     //If you leave it blank, the Android operating system will save it to the gallery.
-    //     dirPathToSave: savedDirPath,
-    //     audioEnable: audio,
-    //     width: width,
-    //     height: height,
-    //   );
-    //   setState(() {
-    //     response = startResponse;
-    //   });
-    // } on PlatformException {
-    //   kDebugMode ? debugPrint("Error: An error occurred while starting the recording!") : null;
-    // }
-    // return response;
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      // If not we will ask for permission first
+      await Permission.storage.request();
+    }
     // save path: /storage/emulated/0/Download/<App name>/<filename>.mp4
     // Reason for saving file in that path: https://github.com/Isvisoft/flutter_screen_recording/blob/9c1639011ff37055311f5ff4dc27d1be9d8cea58/flutter_screen_recording/android/src/main/kotlin/com/isvisoft/flutter_screen_recording/FlutterScreenRecordingPlugin.kt
     bool start = false;
@@ -141,7 +107,7 @@ class _Homepage extends State<Homepage> {
     }
 
     double screenWidth =MediaQuery.of(context).size.width;
-    double sceenHeight =MediaQuery.of(context).size.height;
+    double screenHeight =MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(
@@ -150,7 +116,7 @@ class _Homepage extends State<Homepage> {
         backgroundColor: Colors.grey,
         leading: Image(
             width: screenWidth / 5,
-            height: sceenHeight / 5,
+            height: screenHeight / 5,
             image: const AssetImage('assets/images/HuRoLabIcon.png')),
         actions: [
           IconButton(onPressed: (){
@@ -343,7 +309,7 @@ Future<void> openApp(String packageName) async {
 Future<void> startStreaming() async{
   await FlutterWindowManager.clearFlags(
       FlutterWindowManager.FLAG_SECURE);
-  openApp('info.dvkr.screenstream');
+  openApp('info.dvkr.screenstream.dev');
 }
 
 Future<void> stopStreaming() async{
