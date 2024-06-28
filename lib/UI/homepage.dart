@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,10 +5,8 @@ import 'package:flutter_screen_recording/flutter_screen_recording.dart';
 import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'package:VRHuRoLab/io.dart';
 import 'package:device_apps/device_apps.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
-// import 'package:ed_screen_recorder/ed_screen_recorder.dart';
 import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 
 void logError(String code, String message) =>

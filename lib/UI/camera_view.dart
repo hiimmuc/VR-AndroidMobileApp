@@ -327,57 +327,56 @@ class _CameraScreenState extends State<CameraScreen> {
                             Container(
                               width: sliderWidth,
                               alignment: Alignment.centerLeft,
-                              child: Expanded(
-                                child: RotatedBox(
-                                  quarterTurns: 1,
-                                  child: Slider(
-                                    value: cameraAngle,
-                                    divisions: (maxAngleValue.toInt() -
-                                        minAngleValue.toInt()),
-                                    label: '${cameraAngle.toInt()}',
-                                    activeColor: Colors.grey,
-                                    inactiveColor:
-                                    Colors.grey.withOpacity(0.2),
-                                    onChanged: (dynamic newValue) {
-                                      setState(() {
-                                        cameraAngle = newValue;
-                                      });
-                                    },
-                                    min: minAngleValue,
-                                    max: maxAngleValue,
-                                  ),
+                              child: RotatedBox(
+                                quarterTurns: 1,
+                                child: Slider(
+                                  value: cameraAngle,
+                                  divisions: (maxAngleValue.toInt() -
+                                      minAngleValue.toInt()),
+                                  label: '${cameraAngle.toInt()}',
+                                  activeColor: Colors.grey,
+                                  inactiveColor:
+                                  Colors.grey.withOpacity(0.2),
+                                  onChanged: (dynamic newValue) {
+                                    setState(() {
+                                      cameraAngle = newValue;
+                                    });
+                                  },
+                                  min: minAngleValue,
+                                  max: maxAngleValue,
                                 ),
                               ),
                             ),
+
                             //padding for screen view
                             SizedBox(
                                 width: previewWidth -
                                     2 * sliderWidth -
                                     2 * paddingWidth),
+
                             //Slider for camera zoom
                             Container(
                               width: sliderWidth,
                               alignment: Alignment.centerLeft,
-                              child: Expanded(
-                                child: RotatedBox(
-                                  quarterTurns: 3,
-                                  child: Slider(
-                                    value: cameraZoom,
-                                    label: '$cameraZoom',
-                                    min: minZoomLevel,
-                                    max: maxZoomLevel,
-                                    activeColor: Colors.grey,
-                                    inactiveColor:
-                                    Colors.grey.withOpacity(0.2),
-                                    onChanged: (newValue) {
-                                      setState(() {
-                                        cameraZoom = newValue;
-                                      });
-                                    },
-                                  ),
+                              child: RotatedBox(
+                                quarterTurns: 3,
+                                child: Slider(
+                                  value: cameraZoom,
+                                  label: '$cameraZoom',
+                                  min: minZoomLevel,
+                                  max: maxZoomLevel,
+                                  activeColor: Colors.grey,
+                                  inactiveColor:
+                                  Colors.grey.withOpacity(0.2),
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      cameraZoom = newValue;
+                                    });
+                                  },
                                 ),
                               ),
                             ),
+
                             //right padding
                             SizedBox(
                               width: paddingWidth,
