@@ -8,6 +8,7 @@ import 'package:device_apps/device_apps.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_windowmanager/flutter_windowmanager.dart';
+import 'package:open_file_manager/open_file_manager.dart';
 
 void logError(String code, String message) =>
     print('Error: $code\nError Message: $message');
@@ -151,33 +152,20 @@ class _Homepage extends State<Homepage> {
                   if (isExporting)
                     const Center(child: CircularProgressIndicator())
                   else ...[
-                    if ((!isRecording || !isStreaming) && !isExporting)
-                      if (!isRecording)
-                        ElevatedButton(
-                          onPressed: () {
-                            startScreenRecord(false, "screen_${timestamp()}",
-                                context.size?.width.toInt() ?? 0,
-                                context.size?.height.toInt() ?? 0);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Started video recording")));
-                            setState(() {
-                              isRecording = true;
-                            });
-                          },
-                          child: const Text('Start recording'),
-                        ),
-                      if (!isStreaming)
-                        ElevatedButton(
-                          onPressed: () {
-                            startStreaming();
-                            setState(() {
-                              isStreaming = true;
-                            });
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Started video streaming")));
-                          },
-                          child: const Text('Start streaming'),
-                        ),
+                    if (!isRecording && !isExporting)
+                      ElevatedButton(
+                        onPressed: () {
+                          startScreenRecord(false, "screen_${timestamp()}",
+                              context.size?.width.toInt() ?? 0,
+                              context.size?.height.toInt() ?? 0);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Started video recording")));
+                          setState(() {
+                            isRecording = true;
+                          });
+                        },
+                        child: const Text('Start recording'),
+                      ),
                     // endif
                     if (isRecording && !isExporting)
                       ElevatedButton(
@@ -195,7 +183,21 @@ class _Homepage extends State<Homepage> {
                         },
                         child: const Text('Stop recording'),
                       ),
-                    if (isStreaming)
+
+                    if (!isStreaming && !isExporting)
+                      ElevatedButton(
+                        onPressed: () {
+                          startStreaming();
+                          setState(() {
+                            isStreaming = true;
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Started video streaming")));
+                        },
+                        child: const Text('Start streaming'),
+                      ),
+
+                    if (isStreaming && !isExporting)
                       ElevatedButton(
                         onPressed: () {
                           stopStreaming();
@@ -207,6 +209,7 @@ class _Homepage extends State<Homepage> {
                         },
                         child: const Text('Stop Streaming'),
                       ),
+
                     if (isViewing)
                       ElevatedButton(
                         onPressed: () {
@@ -218,9 +221,19 @@ class _Homepage extends State<Homepage> {
                       ),
                     //endif
                   ],
+
                   ElevatedButton(
                     onPressed: () {
-                      openApp("com.oneplus.filemanager");
+                      // openApp("com.oneplus.filemanager");
+                      openFileManager(
+                        androidConfig: AndroidConfig(
+                          folderType: FolderType.recent,
+                        ),
+                        iosConfig: IosConfig(
+                          // Path is case-sensitive here.
+                          subFolderPath: 'Pictures/Screenshots',
+                        ),
+                      );
                     },
                     child: const Text('Open FileManager'),
                   )

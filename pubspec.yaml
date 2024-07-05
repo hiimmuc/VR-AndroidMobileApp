@@ -75,6 +75,7 @@ dependencies:
   url_launcher: ^6.2.6
   android_intent: ^2.0.2
   flutter_windowmanager: ^0.2.0
+  open_file_manager: ^1.0.2
 
 dev_dependencies:
   flutter_test:
