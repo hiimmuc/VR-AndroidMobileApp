@@ -42,11 +42,12 @@ class _CameraScreenState extends State<CameraScreen> {
   //Camera settings
   double previewHeight = 0.0;
   double previewWidth = 0.0;
-  double sliderWidth = 50;
+  double sliderWidth = 30;
   double paddingWidth = 10;
 
   double xOffset = 50.0;
-  double cameraAngle = 0.0;
+  double cameraAngleRight = 0.0;
+  double cameraAngleLeft = 0.0;
   double cameraZoom = 1.0;
   bool showInfoDialog = false;
 
@@ -70,13 +71,22 @@ class _CameraScreenState extends State<CameraScreen> {
         cameraZoom -= 0.1;
         cameraZoom = cameraZoom > minZoomLevel ? cameraZoom : minZoomLevel;
       }
-      if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-        cameraAngle += 1;
-        cameraAngle = cameraAngle < maxAngleValue ? cameraAngle : maxAngleValue;
+      if (event.logicalKey == LogicalKeyboardKey.digit8) {
+        cameraAngleLeft += 1;
+        cameraAngleLeft = cameraAngleLeft < maxAngleValue ? cameraAngleLeft : maxAngleValue;
       }
-      if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-        cameraAngle -= 1;
-        cameraAngle = cameraAngle > minAngleValue ? cameraAngle : minAngleValue;
+      if (event.logicalKey == LogicalKeyboardKey.digit2) {
+        cameraAngleLeft -= 1;
+        cameraAngleLeft = cameraAngleLeft > minAngleValue ? cameraAngleLeft : minAngleValue;
+      }
+      if (event.logicalKey == LogicalKeyboardKey.digit4) {
+        cameraAngleRight += 1;
+        cameraAngleRight = cameraAngleRight < maxAngleValue ? cameraAngleRight : maxAngleValue;
+      }
+      if (event.logicalKey == LogicalKeyboardKey.digit6) {
+        cameraAngleRight -= 1;
+        cameraAngleRight =
+        cameraAngleRight > minAngleValue ? cameraAngleRight : minAngleValue;
       }
     });
     return KeyEventResult.handled;
@@ -194,7 +204,7 @@ class _CameraScreenState extends State<CameraScreen> {
                                 child: Transform.translate(
                                   offset: Offset(xOffset, 0),
                                   child: Transform.rotate(
-                                    angle: (cameraAngle * pi) / 180,
+                                    angle: (cameraAngleLeft * pi) / 180,
                                     child: Transform.scale(
                                       scale: cameraZoom,
                                       child: FittedBox(
@@ -220,7 +230,7 @@ class _CameraScreenState extends State<CameraScreen> {
                                 child: Transform.translate(
                                   offset: Offset(-xOffset, 0),
                                   child: Transform.rotate(
-                                    angle: (cameraAngle * pi) / 180,
+                                    angle: (cameraAngleRight* pi) / 180,
                                     child: Transform.scale(
                                       scale: cameraZoom,
                                       child: FittedBox(
@@ -253,33 +263,49 @@ class _CameraScreenState extends State<CameraScreen> {
                             // Text for angle
                             Column(
                               children: [
-                                //text offset
-                                Text(
-                                  xOffset.toStringAsFixed(2),
-                                  style: const TextStyle(
-                                      color: Color.fromARGB(216, 0, 255, 0),
-                                      fontSize: 12),
+                                Row(
+                                  children: [
+                                    //text offset
+                                    Text(
+                                      xOffset.toStringAsFixed(1),
+                                      style: const TextStyle(
+                                          color: Color.fromARGB(216, 0, 255, 0),
+                                          fontSize: 12),
+                                    ),
+                                    const Text(" "),
+                                    //text zoom
+                                    Text(
+                                      cameraZoom.toStringAsFixed(1),
+                                      style: const TextStyle(
+                                          color: Color.fromARGB(216, 255, 0, 0),
+                                          fontSize: 14),
+                                    ),
+                                  ],
                                 ),
+
                                 //text angle
-                                Text(
-                                  cameraAngle.toStringAsFixed(2),
-                                  style: const TextStyle(
-                                      color:
-                                      Color.fromARGB(216, 255, 165, 0),
-                                      fontSize: 16),
-                                ),
-                                //test zoom
-                                Text(
-                                  cameraZoom.toStringAsFixed(2),
-                                  style: const TextStyle(
-                                      color: Color.fromARGB(216, 255, 0, 0),
-                                      fontSize: 16),
+                                Row(
+                                  children: [
+                                    Text(
+                                    cameraAngleLeft.toStringAsFixed(1),
+                                    style: const TextStyle(
+                                        color:
+                                        Color.fromARGB(216, 255, 165, 0),
+                                        fontSize: 14),
+                                    ),
+                                    const Text(" "),
+                                    Text(
+                                      cameraAngleRight.toStringAsFixed(1),
+                                      style: const TextStyle(
+                                          color:
+                                          Color.fromARGB(216, 255, 165, 0),
+                                          fontSize: 14),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-
                             SizedBox(width: paddingWidth * 0.1),
-
                             // Slider for offset
                             Expanded(
                               child: Slider(
@@ -330,16 +356,39 @@ class _CameraScreenState extends State<CameraScreen> {
                               child: RotatedBox(
                                 quarterTurns: 1,
                                 child: Slider(
-                                  value: cameraAngle,
+                                  value: cameraAngleLeft,
                                   divisions: (maxAngleValue.toInt() -
                                       minAngleValue.toInt()),
-                                  label: '${cameraAngle.toInt()}',
+                                  label: '${cameraAngleLeft.toInt()}',
                                   activeColor: Colors.grey,
                                   inactiveColor:
                                   Colors.grey.withOpacity(0.2),
                                   onChanged: (dynamic newValue) {
                                     setState(() {
-                                      cameraAngle = newValue;
+                                      cameraAngleLeft = newValue;
+                                    });
+                                  },
+                                  min: minAngleValue,
+                                  max: maxAngleValue,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: sliderWidth,
+                              alignment: Alignment.centerLeft,
+                              child: RotatedBox(
+                                quarterTurns: 1,
+                                child: Slider(
+                                  value: cameraAngleRight,
+                                  divisions: (maxAngleValue.toInt() -
+                                      minAngleValue.toInt()),
+                                  label: '${cameraAngleRight.toInt()}',
+                                  activeColor: Colors.grey,
+                                  inactiveColor:
+                                  Colors.grey.withOpacity(0.2),
+                                  onChanged: (dynamic newValue) {
+                                    setState(() {
+                                      cameraAngleRight = newValue;
                                     });
                                   },
                                   min: minAngleValue,
@@ -351,8 +400,8 @@ class _CameraScreenState extends State<CameraScreen> {
                             //padding for screen view
                             SizedBox(
                                 width: previewWidth -
-                                    2 * sliderWidth -
-                                    2 * paddingWidth),
+                                    3 * sliderWidth -
+                                    3 * paddingWidth),
 
                             //Slider for camera zoom
                             Container(
